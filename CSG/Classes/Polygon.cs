@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using System;
 
 namespace Parabox.CSG
 {
@@ -33,5 +34,5 @@ namespace Parabox.CSG
         {
             return $"[{vertices.Count}] {plane.normal}";
         }
-    }
+	}
 }

@@ -187,11 +187,11 @@ namespace Parabox.CSG
             return list;
         }
 
-        #region STATIC OPERATIONS
+		#region STATIC OPERATIONS
 
-        // Return a new CSG solid representing space in either this solid or in the
-        // solid `csg`. Neither this solid nor the solid `csg` are modified.
-        public static Node Union(Node a1, Node b1)
+		// Return a new CSG solid representing space in either this solid or in the
+		// solid `csg`. Neither this solid nor the solid `csg` are modified.
+		public static Node Union(Node a1, Node b1)
         {
             Node a = a1.Clone();
             Node b = b1.Clone();
@@ -251,6 +251,7 @@ namespace Parabox.CSG
             return ret;
         }
 
-        #endregion
-    }
+
+		#endregion
+	}
 }

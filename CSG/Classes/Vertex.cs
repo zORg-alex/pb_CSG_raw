@@ -189,5 +189,16 @@ namespace Parabox.CSG
             if (hasTangent)
                 m_Tangent *= -1f;
         }
-    }
+
+		internal Vertex Transformed(Matrix4x4 transform)
+        {
+            if (hasPosition)
+                position = transform.MultiplyPoint3x4(m_Position);
+            if (hasNormal)
+                normal = transform.rotation * m_Normal;
+            if (hasTangent)
+                tangent = transform.rotation * m_Tangent;
+            return this;
+        }
+	}
 }

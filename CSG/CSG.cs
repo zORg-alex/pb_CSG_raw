@@ -62,6 +62,25 @@ namespace Parabox.CSG
             }
         }
 
+		/// <summary>
+		/// Performs a boolean operation on two Mesh and Transform pairs.
+		/// </summary>
+		/// <returns>A new mesh.</returns>
+		public static Model Perform(BooleanOp op, Mesh lhm, Material[] lhms, Transform lht, Mesh rhm, Material[] rhms, Transform rht)
+		{
+            switch (op)
+            {
+                case BooleanOp.Intersection:
+                    return Intersect(lhm, lhms, lht, rhm, rhms, rht);
+                case BooleanOp.Union:
+                    return Union(lhm, lhms, lht, rhm, rhms, rht);
+				case BooleanOp.Subtraction:
+                    return Subtract(lhm, lhms, lht, rhm, rhms, rht);
+				default:
+                    return null;
+            }
+        }
+
         /// <summary>
         /// Returns a new mesh by merging @lhs with @rhs.
         /// </summary>
@@ -77,36 +96,77 @@ namespace Parabox.CSG
             Node b = new Node(csg_model_b.ToPolygons());
         
             List<Polygon> polygons = Node.Union(a, b).AllPolygons();
-        
-            return new Model(polygons);
-        }
-        
-        /// <summary>
-        /// Returns a new mesh by subtracting @lhs with @rhs.
-        /// </summary>
-        /// <param name="lhs">The base mesh of the boolean operation.</param>
-        /// <param name="rhs">The input mesh of the boolean operation.</param>
-        /// <returns>A new mesh if the operation succeeds, or null if an error occurs.</returns>
-        public static Model Subtract(GameObject lhs, GameObject rhs)
-        {
-            Model csg_model_a = new Model(lhs);
-            Model csg_model_b = new Model(rhs);
-        
-            Node a = new Node(csg_model_a.ToPolygons());
-            Node b = new Node(csg_model_b.ToPolygons());
-        
-            List<Polygon> polygons = Node.Subtract(a, b).AllPolygons();
-        
-            return new Model(polygons);
-        }
 
-        /// <summary>
-        /// Returns a new mesh by intersecting @lhs with @rhs.
-        /// </summary>
-        /// <param name="lhs">The base mesh of the boolean operation.</param>
-        /// <param name="rhs">The input mesh of the boolean operation.</param>
-        /// <returns>A new mesh if the operation succeeds, or null if an error occurs.</returns>
-        public static Model Intersect(GameObject lhs, GameObject rhs)
+			return new Model(polygons, lhs.transform.worldToLocalMatrix);
+		}
+
+		/// <summary>
+		/// Returns a new mesh by merging <paramref name="lhm"/> with <paramref name="rhm"/> with transforms <paramref name="lht"/> and <paramref name="rht"/>.
+		/// </summary>
+		/// <param name="lhm">First Mesh</param>
+		/// <param name="lht">First Transform</param>
+		/// <param name="rhm">Second Mesh</param>
+		/// <param name="rht">Second Transform</param>
+		/// <returns></returns>
+		public static Model Union(Mesh lhm, Material[] lhms, Transform lht, Mesh rhm, Material[] rhms, Transform rht)
+		{
+			Model csg_model_a = new Model(lhm, lhms, lht);
+			Model csg_model_b = new Model(rhm, rhms, rht);
+
+			Node a = new Node(csg_model_a.ToPolygons());
+			Node b = new Node(csg_model_b.ToPolygons());
+
+			List<Polygon> polygons = Node.Union(a, b).AllPolygons();
+
+			return new Model(polygons, lht.worldToLocalMatrix);
+		}
+
+		/// <summary>
+		/// Returns a new mesh by subtracting @lhs with @rhs.
+		/// </summary>
+		/// <param name="lhs">The base mesh of the boolean operation.</param>
+		/// <param name="rhs">The input mesh of the boolean operation.</param>
+		/// <returns>A new mesh if the operation succeeds, or null if an error occurs.</returns>
+		public static Model Subtract(GameObject lhs, GameObject rhs)
+		{
+			Model csg_model_a = new Model(lhs);
+			Model csg_model_b = new Model(rhs);
+
+			Node a = new Node(csg_model_a.ToPolygons());
+			Node b = new Node(csg_model_b.ToPolygons());
+
+			List<Polygon> polygons = Node.Subtract(a, b).AllPolygons();
+
+			return new Model(polygons, lhs.transform.worldToLocalMatrix);
+		}
+		/// <summary>
+		/// Returns a new mesh by subtracting <paramref name="lhm"/> with <paramref name="rhm"/> with transforms <paramref name="lht"/> and <paramref name="rht"/>.
+		/// </summary>
+		/// <param name="lhm">First Mesh</param>
+		/// <param name="lht">First Transform</param>
+		/// <param name="rhm">Second Mesh</param>
+		/// <param name="rht">Second Transform</param>
+		/// <returns></returns>
+		public static Model Subtract(Mesh lhm, Material[] lhms, Transform lht, Mesh rhm, Material[] rhms, Transform rht)
+		{
+			Model csg_model_a = new Model(lhm, lhms, lht);
+			Model csg_model_b = new Model(rhm, rhms, rht);
+
+			Node a = new Node(csg_model_a.ToPolygons());
+			Node b = new Node(csg_model_b.ToPolygons());
+
+			List<Polygon> polygons = Node.Subtract(a, b).AllPolygons();
+
+			return new Model(polygons, lht.worldToLocalMatrix);
+		}
+
+		/// <summary>
+		/// Returns a new mesh by intersecting @lhs with @rhs.
+		/// </summary>
+		/// <param name="lhs">The base mesh of the boolean operation.</param>
+		/// <param name="rhs">The input mesh of the boolean operation.</param>
+		/// <returns>A new mesh if the operation succeeds, or null if an error occurs.</returns>
+		public static Model Intersect(GameObject lhs, GameObject rhs)
         {
             Model csg_model_a = new Model(lhs);
             Model csg_model_b = new Model(rhs);
@@ -116,7 +176,27 @@ namespace Parabox.CSG
 
             List<Polygon> polygons = Node.Intersect(a, b).AllPolygons();
 
-            return new Model(polygons);
+            return new Model(polygons, lhs.transform.worldToLocalMatrix);
+        }
+		/// <summary>
+		/// Returns a new mesh by intersecting <paramref name="lhm"/> with <paramref name="rhm"/> with transforms <paramref name="lht"/> and <paramref name="rht"/>.
+		/// </summary>
+		/// <param name="lhm">First Mesh</param>
+		/// <param name="lht">First Transform</param>
+		/// <param name="rhm">Second Mesh</param>
+		/// <param name="rht">Second Transform</param>
+		/// <returns></returns>
+		public static Model Intersect(Mesh lhm, Material[] lhms, Transform lht, Mesh rhm, Material[] rhms, Transform rht)
+		{
+			Model csg_model_a = new Model(lhm, lhms, lht);
+			Model csg_model_b = new Model(rhm, rhms, rht);
+
+			Node a = new Node(csg_model_a.ToPolygons());
+            Node b = new Node(csg_model_b.ToPolygons());
+
+            List<Polygon> polygons = Node.Intersect(a, b).AllPolygons();
+
+            return new Model(polygons, lht.worldToLocalMatrix);
         }
     }
 }

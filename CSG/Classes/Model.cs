@@ -56,7 +56,8 @@ namespace Parabox.CSG
                 throw new ArgumentNullException("transform");
 
             m_Vertices = VertexUtility.GetVertices(mesh).Select(x => transform.TransformVertex(x)).ToList();
-            m_Materials = new List<Material>(materials);
+            if (materials != null)
+                m_Materials = new List<Material>(materials);
             m_Indices = new List<List<int>>();
 
             for (int i = 0, c = mesh.subMeshCount; i < c; i++)
@@ -71,7 +72,7 @@ namespace Parabox.CSG
 
         internal Model(List<Polygon> polygons)
         {
-            m_Vertices = new List<Vertex>();
+            m_Vertices = new List<Vertex>(3);
             Dictionary<Material, List<int>> submeshes = new Dictionary<Material, List<int>>();
 
             int p = 0;
@@ -99,9 +100,17 @@ namespace Parabox.CSG
 
             m_Materials = submeshes.Keys.ToList();
             m_Indices = submeshes.Values.ToList();
+		}
+		internal Model(List<Polygon> polygons, Matrix4x4 transform) : this(polygons)
+        {
+            for (int i = 0; i < m_Vertices.Count; i++)
+            {
+				m_Vertices[i] = m_Vertices[i].Transformed(transform);
+            }
         }
 
-        internal List<Polygon> ToPolygons()
+
+		internal List<Polygon> ToPolygons()
         {
             List<Polygon> list = new List<Polygon>();
 

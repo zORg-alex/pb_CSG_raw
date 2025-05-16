@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using System;
 
 namespace Parabox.CSG
 {
@@ -137,5 +138,18 @@ namespace Parabox.CSG
                 break;
             }   // End switch(polygonType)
         }
-    }
+
+		internal void Transform(Matrix4x4 transform)
+        {
+			Matrix4x4 inversed = transform.inverse;
+			float x = normal.x;
+			float y = normal.y;
+			float z = normal.z;
+			float x2 = inversed.m00 * x + inversed.m10 * y + inversed.m20 * z + inversed.m30 * w;
+			float y2 = inversed.m01 * x + inversed.m11 * y + inversed.m21 * z + inversed.m31 * w;
+			float z2 = inversed.m02 * x + inversed.m12 * y + inversed.m22 * z + inversed.m32 * w;
+			w = inversed.m03 * x + inversed.m13 * y + inversed.m23 * z + inversed.m33 * w;
+            normal = new Vector3(x2, y2, z2);
+		}
+	}
 }
