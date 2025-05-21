@@ -137,18 +137,23 @@ namespace Parabox.CSG
         public static explicit operator Mesh(Model model)
         {
             var mesh = new Mesh();
-            VertexUtility.SetMesh(mesh, model.m_Vertices);
-            mesh.subMeshCount = model.m_Indices.Count;
-            for (int i = 0, c = mesh.subMeshCount; i < c; i++)
-            {
-#if UNITY_2019_3_OR_NEWER
-                mesh.SetIndices(model.m_Indices[i], MeshTopology.Triangles, i);
-#else
-                mesh.SetIndices(model.m_Indices[i].ToArray(), MeshTopology.Triangles, i);
-#endif
-            }
+            model.CopyToMesh(mesh);
 
             return mesh;
         }
-    }
+
+		public void CopyToMesh(Mesh destination)
+		{
+			VertexUtility.SetMesh(destination, m_Vertices);
+			destination.subMeshCount = m_Indices.Count;
+			for (int i = 0, c = destination.subMeshCount; i < c; i++)
+			{
+#if UNITY_2019_3_OR_NEWER
+				destination.SetIndices(m_Indices[i], MeshTopology.Triangles, i);
+#else
+                destination.SetIndices(m_Indices[i].ToArray(), MeshTopology.Triangles, i);
+#endif
+			}
+		}
+	}
 }
